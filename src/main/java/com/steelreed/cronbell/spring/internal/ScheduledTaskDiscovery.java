@@ -16,6 +16,7 @@
 
 package com.steelreed.cronbell.spring.internal;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.Duration;
 import java.time.ZoneId;
@@ -46,6 +47,7 @@ import org.springframework.scheduling.config.IntervalTask;
 import org.springframework.scheduling.config.Task;
 import org.springframework.scheduling.support.ScheduledMethodRunnable;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.ReflectionUtils;
 import org.springframework.util.StringUtils;
 
 /**
@@ -91,7 +93,8 @@ public class ScheduledTaskDiscovery {
 	public List<Discovered> discover(Collection<? extends Task> tasks, Set<ScheduledKey> known) {
 		Map<ScheduledKey, List<Task>> byMethod = new LinkedHashMap<>();
 		for (Task task : tasks) {
-			if (task.getRunnable() instanceof ScheduledMethodRunnable runnable) {
+			ScheduledMethodRunnable runnable = methodRunnable(task);
+			if (runnable != null) {
 				ScheduledKey key = ScheduledKey.of(runnable.getTarget(), runnable.getMethod());
 				List<Task> sameMethod = byMethod.computeIfAbsent(key, (k) -> new ArrayList<>());
 				if (!sameMethod.contains(task)) {
@@ -105,7 +108,7 @@ public class ScheduledTaskDiscovery {
 				continue;
 			}
 			List<Task> sameMethod = entry.getValue();
-			ScheduledMethodRunnable runnable = (ScheduledMethodRunnable) sameMethod.get(0).getRunnable();
+			ScheduledMethodRunnable runnable = methodRunnable(sameMethod.get(0));
 			String source = "@Scheduled " + entry.getKey().targetClass().getSimpleName() + "."
 					+ runnable.getMethod().getName() + "()";
 			if (sameMethod.size() > 1) {
@@ -124,6 +127,37 @@ public class ScheduledTaskDiscovery {
 			}
 		}
 		return result;
+	}
+
+	/**
+	 * The {@code ScheduledMethodRunnable} of a task. Spring Framework 6.2+ wraps it in a
+	 * private outcome-tracking runnable with no accessor, so the wrapper's field is read.
+	 * @param task the task
+	 * @return the method runnable, or {@code null} if the task does not run a method
+	 */
+	public static ScheduledMethodRunnable methodRunnable(Task task) {
+		Runnable runnable = task.getRunnable();
+		for (int depth = 0; depth < 3 && runnable != null; depth++) {
+			if (runnable instanceof ScheduledMethodRunnable methodRunnable) {
+				return methodRunnable;
+			}
+			runnable = wrapped(runnable);
+		}
+		return null;
+	}
+
+	private static Runnable wrapped(Runnable runnable) {
+		try {
+			Field field = ReflectionUtils.findField(runnable.getClass(), "runnable", Runnable.class);
+			if (field == null) {
+				return null;
+			}
+			ReflectionUtils.makeAccessible(field);
+			return (Runnable) field.get(runnable);
+		}
+		catch (Exception | LinkageError ex) {
+			return null;
+		}
 	}
 
 	private MonitoredCheck toCheck(Task task, ScheduledMethodRunnable runnable, String source) {

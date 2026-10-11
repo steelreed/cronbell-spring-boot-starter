@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 
 import org.springframework.scheduling.config.ScheduledTask;
 import org.springframework.scheduling.config.Task;
+import org.springframework.scheduling.support.ScheduledMethodRunnable;
 
 /**
  * Holds the monitored checks and the reporter; adds newly discovered jobs.
@@ -70,7 +71,8 @@ public class CronbellMonitor implements AutoCloseable {
 	public List<MonitoredCheck> addScheduled(ScheduledTaskDiscovery discovery, Collection<? extends Task> tasks) {
 		Set<ScheduledKey> known = new HashSet<>();
 		for (Task task : tasks) {
-			if (task.getRunnable() instanceof org.springframework.scheduling.support.ScheduledMethodRunnable runnable) {
+			ScheduledMethodRunnable runnable = ScheduledTaskDiscovery.methodRunnable(task);
+			if (runnable != null) {
 				ScheduledKey key = ScheduledKey.of(runnable.getTarget(), runnable.getMethod());
 				if (this.registry.contains(key)) {
 					known.add(key);
