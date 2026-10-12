@@ -31,6 +31,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 /**
@@ -54,6 +55,7 @@ class MinimalClasspathTests {
 				ConfigurableApplicationContext context = TestApps.start(App.class, "cronbell.url=" + server.url())) {
 			Await.until(Duration.ofSeconds(10), () -> !server.pings("minimal.tick", "").isEmpty(),
 					"a success ping from a plain Spring Boot application");
+			assertThat(context.isRunning()).isTrue();
 		}
 	}
 

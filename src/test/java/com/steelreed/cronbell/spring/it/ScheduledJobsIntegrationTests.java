@@ -179,8 +179,9 @@ class ScheduledJobsIntegrationTests {
 	void environmentPrefixAndExclude() {
 		this.context = TestApps.start(PoolApp.class, TestApps.NO_QUARTZ, "cronbell.url=" + this.server.url(),
 				"cronbell.environment=staging", "cronbell.exclude=jobs.failing,jobs.delayed");
-		Await.until(WAIT, () -> this.server.upserts("staging.jobs.fast").size() == 1, "prefixed check");
-		assertThat(this.server.upserts("staging.billing-close")).hasSize(1);
+		// Checks are registered one by one on the reporter thread, in no fixed order.
+		Await.until(WAIT, () -> this.server.upserts("staging.jobs.fast").size() == 1
+				&& this.server.upserts("staging.billing-close").size() == 1, "prefixed checks");
 		assertThat(this.server.requests((r) -> r.path().contains("failing") || r.path().contains("delayed"))).isEmpty();
 	}
 
