@@ -8,8 +8,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import com.steelreed.cronbell.spring.CronbellCheck;
-import com.steelreed.cronbell.spring.internal.CronbellInfoContributor;
 import com.steelreed.cronbell.spring.internal.CronbellMonitor;
+import com.steelreed.cronbell.spring.internal.actuator.CronbellInfoContributor;
 import com.steelreed.cronbell.spring.test.Await;
 import com.steelreed.cronbell.spring.test.FakeCronbellServer;
 import com.steelreed.cronbell.spring.test.FakeCronbellServer.Request;

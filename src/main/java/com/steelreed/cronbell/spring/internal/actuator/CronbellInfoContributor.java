@@ -14,10 +14,13 @@
  * limitations under the License.
  */
 
-package com.steelreed.cronbell.spring.internal;
+package com.steelreed.cronbell.spring.internal.actuator;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import com.steelreed.cronbell.spring.internal.CronbellMonitor;
+import com.steelreed.cronbell.spring.internal.MonitoredCheck;
 
 import org.springframework.boot.actuate.info.Info;
 import org.springframework.boot.actuate.info.InfoContributor;
