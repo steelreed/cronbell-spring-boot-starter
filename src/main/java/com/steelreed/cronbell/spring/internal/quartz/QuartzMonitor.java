@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.steelreed.cronbell.spring.internal;
+package com.steelreed.cronbell.spring.internal.quartz;
 
 import java.time.Duration;
 import java.util.ArrayList;
@@ -23,6 +23,14 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 import com.steelreed.cronbell.spring.CronbellProperties;
+import com.steelreed.cronbell.spring.internal.CheckDefinition;
+import com.steelreed.cronbell.spring.internal.CronbellMonitor;
+import com.steelreed.cronbell.spring.internal.Durations;
+import com.steelreed.cronbell.spring.internal.MonitoredCheck;
+import com.steelreed.cronbell.spring.internal.RescannableJobSource;
+import com.steelreed.cronbell.spring.internal.Run;
+import com.steelreed.cronbell.spring.internal.SlugFilter;
+import com.steelreed.cronbell.spring.internal.SlugNaming;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.CronTrigger;

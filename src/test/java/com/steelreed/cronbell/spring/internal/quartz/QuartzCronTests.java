@@ -1,4 +1,4 @@
-package com.steelreed.cronbell.spring.internal;
+package com.steelreed.cronbell.spring.internal.quartz;
 
 import org.junit.jupiter.api.Test;
 

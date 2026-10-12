@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.steelreed.cronbell.spring.internal;
+package com.steelreed.cronbell.spring.internal.shedlock;
 
 import java.util.Optional;
 
