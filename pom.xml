@@ -50,7 +50,8 @@
     <!-- The Spring Boot line the build compiles and tests against. CI also runs the floor
          (-Pboot33) and the 4.x line (-Pboot4); see the profiles at the end. -->
     <spring-boot.version>3.5.16</spring-boot.version>
-    <!-- Test only: ShedLock 6 is the Spring 6 line, ShedLock 7 the Spring 7 line. -->
+    <!-- Test only. ShedLock 6 supports Spring 6.1 and 6.2 (Boot 3.3 to 3.5); ShedLock 7 needs
+         Spring 6.2+ (Boot 3.4+), so it is used for the Boot 4 profile only. Both need Java 17. -->
     <shedlock.version>6.10.0</shedlock.version>
     <archunit.version>1.5.1</archunit.version>
 
@@ -61,7 +62,7 @@
     <source-plugin.version>3.4.0</source-plugin.version>
     <javadoc-plugin.version>3.12.0</javadoc-plugin.version>
     <gpg-plugin.version>3.2.8</gpg-plugin.version>
-    <central-publishing-plugin.version>0.8.0</central-publishing-plugin.version>
+    <central-publishing-plugin.version>0.11.0</central-publishing-plugin.version>
     <enforcer-plugin.version>3.6.3</enforcer-plugin.version>
     <spring-javaformat.version>0.0.48</spring-javaformat.version>
   </properties>
@@ -94,6 +95,12 @@
       <groupId>org.quartz-scheduler</groupId>
       <artifactId>quartz</artifactId>
       <optional>true</optional>
+    </dependency>
+    <!-- Compile only: Actuator's Info type carries Jackson annotations; without them javac warns. -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
@@ -129,7 +136,9 @@
           <version>${compiler-plugin.version}</version>
           <configuration>
             <compilerArgs>
+              <!-- Every lint warning, deprecation and removal included, fails the build. -->
               <arg>-Xlint:all,-processing,-options</arg>
+              <arg>-Werror</arg>
               <arg>-parameters</arg>
             </compilerArgs>
             <annotationProcessorPaths>
