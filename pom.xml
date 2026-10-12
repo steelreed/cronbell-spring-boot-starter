@@ -280,7 +280,10 @@
         <shedlock.version>7.10.1</shedlock.version>
       </properties>
     </profile>
-    <!-- Enabled only for releases: ./mvnw -Prelease deploy (the maintainer runs it, never CI on a branch) -->
+    <!-- Enabled only for releases, by .github/workflows/release.yml on a v* tag (see RELEASING.md).
+         Adds the sources and Javadoc jars, GPG signatures and the upload to Maven Central.
+         To check the jars locally without signing or uploading:
+         ./mvnw -Prelease -DskipTests -Dgpg.skip package -->
     <profile>
       <id>release</id>
       <build>
@@ -339,7 +342,10 @@
             <configuration>
               <publishingServerId>central</publishingServerId>
               <autoPublish>false</autoPublish>
-              <!-- Fail the release build when Central rejects the bundle, not later in the portal. -->
+              <!-- Fail the release build when Central rejects the bundle, not later in the portal.
+                   Never set skipPublishing to leave an artifact out: the last module uploads the
+                   whole bundle, so QueryFence 0.1.0 signed everything and uploaded nothing. Use
+                   excludeArtifacts instead (this build has a single module). -->
               <waitUntil>validated</waitUntil>
             </configuration>
           </plugin>
