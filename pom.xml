@@ -162,6 +162,39 @@
       <!-- Fail the build on Java/Maven versions that are too old -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/minimal/**</exclude>
+          </excludes>
+        </configuration>
+        <executions>
+          <!-- A plain Spring Boot classpath: no Actuator, Quartz or ShedLock. -->
+          <execution>
+            <id>minimal-classpath</id>
+            <goals>
+              <goal>test</goal>
+            </goals>
+            <configuration>
+              <excludes combine.self="override"/>
+              <includes>
+                <include>**/minimal/**</include>
+              </includes>
+              <classpathDependencyExcludes>
+                <classpathDependencyExclude>org.springframework.boot:spring-boot-actuator</classpathDependencyExclude>
+                <classpathDependencyExclude>org.springframework.boot:spring-boot-actuator-autoconfigure</classpathDependencyExclude>
+                <classpathDependencyExclude>org.springframework.boot:spring-boot-starter-quartz</classpathDependencyExclude>
+                <classpathDependencyExclude>org.springframework.boot:spring-boot-quartz</classpathDependencyExclude>
+                <classpathDependencyExclude>org.quartz-scheduler:quartz</classpathDependencyExclude>
+                <classpathDependencyExclude>net.javacrumbs.shedlock:shedlock-spring</classpathDependencyExclude>
+                <classpathDependencyExclude>net.javacrumbs.shedlock:shedlock-core</classpathDependencyExclude>
+              </classpathDependencyExcludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
         <version>${enforcer-plugin.version}</version>
         <executions>

@@ -102,8 +102,19 @@ public class CronbellAutoConfiguration {
 			};
 		}
 
+	}
+
+	/**
+	 * Separate class so that applications without Actuator never load a method whose
+	 * signature names an Actuator type: a {@code @ConditionalOnClass} on the bean method
+	 * alone is too late, because Spring introspects every method of the enclosing class.
+	 */
+	@Configuration(proxyBeanMethods = false)
+	@Conditional(CronbellActivation.On.class)
+	@ConditionalOnClass(name = "org.springframework.boot.actuate.info.InfoContributor")
+	static class ActuatorInfo {
+
 		@Bean
-		@ConditionalOnClass(name = "org.springframework.boot.actuate.info.InfoContributor")
 		CronbellInfoContributor cronbellInfoContributor(CronbellMonitor monitor) {
 			return new CronbellInfoContributor(monitor);
 		}
