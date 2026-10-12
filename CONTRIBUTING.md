@@ -30,6 +30,8 @@ libraries must only be loaded when they are present.
 - One change per pull request, with tests that fail without it. Add a CHANGELOG line when users
   will notice.
 
+Releases are cut by the maintainer; see [RELEASING.md](RELEASING.md).
+
 ## Sign your commits (DCO)
 
 Every commit needs a `Signed-off-by` line ([Developer Certificate of Origin](https://developercertificate.org/)):
