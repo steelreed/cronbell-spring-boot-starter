@@ -1,0 +1,18 @@
+version: 2
+updates:
+  - package-ecosystem: maven
+    directory: /
+    schedule:
+      interval: weekly
+    groups:
+      maven:
+        patterns: ["*"]
+        update-types: [minor, patch]
+    ignore:
+      # Several Spring Boot lines are tested through profiles; bump majors by hand.
+      - dependency-name: "org.springframework.boot*"
+        update-types: ["version-update:semver-major"]
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
