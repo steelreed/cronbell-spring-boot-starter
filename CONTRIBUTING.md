@@ -21,7 +21,12 @@ libraries must only be loaded when they are present.
 - A monitoring problem must never slow down or break a user's job. Anything on the job thread must
   be constant time and must not throw.
 - Keep dependencies to what Spring Boot already brings. Optional integrations are `optional` in the
-  POM and guarded with `@ConditionalOnClass(name = ...)` on their own configuration class.
+  POM, live in their own package (`internal.quartz`, `internal.shedlock`, `internal.actuator`) and
+  are guarded with `@ConditionalOnClass(name = ...)` on their own configuration class.
+  `ArchitectureTests` (ArchUnit) fails the build when another class names one of these libraries,
+  even as a string, or when a public type exposes an `internal` type.
+- Everything under `com.steelreed.cronbell.spring.internal` is not public API and may change in any
+  release.
 - One change per pull request, with tests that fail without it. Add a CHANGELOG line when users
   will notice.
 
