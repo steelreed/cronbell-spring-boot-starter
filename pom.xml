@@ -51,7 +51,7 @@
          (-Pboot33) and the 4.x line (-Pboot4); see the profiles at the end. -->
     <spring-boot.version>3.5.16</spring-boot.version>
     <!-- Test only: ShedLock 6 is the Spring 6 line, ShedLock 7 the Spring 7 line. -->
-    <shedlock.version>6.10.0</shedlock.version>
+    <shedlock.version>7.10.1</shedlock.version>
 
     <!-- Plugins -->
     <compiler-plugin.version>3.16.0</compiler-plugin.version>
