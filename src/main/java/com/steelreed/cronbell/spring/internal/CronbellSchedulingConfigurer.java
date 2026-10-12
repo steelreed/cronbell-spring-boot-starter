@@ -90,8 +90,11 @@ public class CronbellSchedulingConfigurer implements SchedulingConfigurer, Order
 			return;
 		}
 		if (this.privateRegistry == null) {
+			// A registry without handlers reports isNoop(), so the handler is added
+			// directly rather than through addHandler.
 			this.privateRegistry = ObservationRegistry.create();
-			addHandler(this.privateRegistry);
+			this.privateRegistry.observationConfig().observationHandler(this.handler);
+			this.handled.add(this.privateRegistry);
 		}
 		registrar.setObservationRegistry(this.privateRegistry);
 	}
