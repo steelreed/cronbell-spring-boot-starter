@@ -133,8 +133,9 @@ public final class FakeCronbellServer implements AutoCloseable {
 					return;
 				}
 				String key = this.keysBySlug.computeIfAbsent(slug, (s) -> UUID.randomUUID().toString());
-				send(exchange, 200, "{\"slug\":\"" + slug + "\",\"pingKey\":\"" + key + "\",\"pingUrl\":\"" + url()
-						+ "/ping/" + key + "\",\"status\":\"NEW\"}");
+				send(exchange, 200, """
+						{"slug": "%s", "pingKey": "%s", "pingUrl": "%s/ping/%s", "status": "NEW"}
+						""".formatted(slug, key, url(), key));
 				return;
 			}
 			if (path.startsWith("/ping/")) {

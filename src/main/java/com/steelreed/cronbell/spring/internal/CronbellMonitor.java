@@ -94,7 +94,7 @@ public class CronbellMonitor implements AutoCloseable {
 	 * @return their tasks
 	 */
 	public static List<Task> tasksOf(Collection<ScheduledTask> scheduled) {
-		return scheduled.stream().map(ScheduledTask::getTask).collect(Collectors.toList());
+		return scheduled.stream().map(ScheduledTask::getTask).toList();
 	}
 
 	/**

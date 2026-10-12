@@ -38,9 +38,18 @@ class JsonTests {
 
 	@Test
 	void parsesServerAnswers() {
-		Object parsed = Json.parse(
-				"{\"slug\":\"a\",\"pingUrl\":\"http://x/ping/k\",\"periodSeconds\":60,\"grace\":1.5,\"paused\":false,"
-						+ "\"cron\":null,\"tags\":[\"x\",{\"y\":true}],\"note\":\"caf\\u00e9\"}");
+		Object parsed = Json.parse("""
+				{
+				  "slug": "a",
+				  "pingUrl": "http://x/ping/k",
+				  "periodSeconds": 60,
+				  "grace": 1.5,
+				  "paused": false,
+				  "cron": null,
+				  "tags": ["x", {"y": true}],
+				  "note": "caf\\u00e9"
+				}
+				""");
 		assertThat(parsed).isInstanceOf(Map.class);
 		Map<?, ?> map = (Map<?, ?>) parsed;
 		assertThat(map.get("pingUrl")).isEqualTo("http://x/ping/k");
