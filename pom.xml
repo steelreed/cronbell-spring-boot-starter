@@ -4,7 +4,7 @@
 
   <groupId>com.steelreed</groupId>
   <artifactId>cronbell-spring-boot-starter</artifactId>
-  <version>0.1.0-beta.1</version>
+  <version>0.1.0-SNAPSHOT</version>
 
   <name>Cronbell Spring Boot Starter</name>
   <description>Monitors every @Scheduled method and Quartz trigger of a Spring Boot application with Cronbell, with no code to write.</description>
