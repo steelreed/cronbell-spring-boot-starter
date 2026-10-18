@@ -9,7 +9,7 @@ starter finds every scheduled job in your application, registers it with
 Cronbell alerts you when a run is missed, fails or takes too long.
 
 > **Status: beta.** `0.1.0-beta.1` is on Maven Central; `0.1.0` comes with Cronbell's first
-> release on October 27, 2026. Try the server at [steelreed.com/cronbell](https://steelreed.com/cronbell/).
+> release on November 3, 2026. Try the server at [steelreed.com/cronbell](https://steelreed.com/cronbell/).
 
 ## Quick start
 
