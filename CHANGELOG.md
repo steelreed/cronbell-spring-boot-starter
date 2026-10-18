@@ -6,6 +6,8 @@ All notable changes are listed here. The format follows
 
 ## [Unreleased]
 
+## [0.1.0-beta.1] - 2026-10-18
+
 ### Added
 
 - Auto-configuration that discovers `@Scheduled` jobs (cron with zone, fixed rate, fixed delay),
