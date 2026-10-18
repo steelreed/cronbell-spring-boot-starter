@@ -18,15 +18,15 @@ package com.steelreed.cronbell.spring;
 
 import com.steelreed.cronbell.spring.internal.CronbellActivation;
 import com.steelreed.cronbell.spring.internal.CronbellClient;
-import com.steelreed.cronbell.spring.internal.CronbellInfoContributor;
 import com.steelreed.cronbell.spring.internal.CronbellMonitor;
 import com.steelreed.cronbell.spring.internal.CronbellSchedulingConfigurer;
-import com.steelreed.cronbell.spring.internal.LockProviderPostProcessor;
-import com.steelreed.cronbell.spring.internal.QuartzMonitor;
 import com.steelreed.cronbell.spring.internal.Reporter;
 import com.steelreed.cronbell.spring.internal.RescannableJobSource;
 import com.steelreed.cronbell.spring.internal.ScheduledRunObservationHandler;
 import com.steelreed.cronbell.spring.internal.ScheduledTaskDiscovery;
+import com.steelreed.cronbell.spring.internal.actuator.CronbellInfoContributor;
+import com.steelreed.cronbell.spring.internal.quartz.QuartzMonitor;
+import com.steelreed.cronbell.spring.internal.shedlock.LockProviderPostProcessor;
 import io.micrometer.observation.ObservationRegistry;
 import org.apache.commons.logging.LogFactory;
 import org.quartz.Scheduler;
@@ -65,11 +65,6 @@ public class CronbellAutoConfiguration {
 					properties.getTimeout().getConnect(), properties.getTimeout().getRead());
 			Reporter reporter = new Reporter(client, properties.isRegister(), properties.getQueueCapacity());
 			return new CronbellMonitor(properties, reporter);
-		}
-
-		@Bean
-		static LockProviderPostProcessor cronbellLockProviderPostProcessor() {
-			return new LockProviderPostProcessor();
 		}
 
 		@Bean
@@ -135,6 +130,23 @@ public class CronbellAutoConfiguration {
 		SmartInitializingSingleton cronbellQuartzAttacher(QuartzMonitor quartz, ObjectProvider<Scheduler> schedulers) {
 			// Before the schedulers start (SmartLifecycle), so no run is missed.
 			return () -> schedulers.orderedStream().forEach(quartz::attach);
+		}
+
+	}
+
+	/**
+	 * Observes ShedLock lock providers, so that a run skipped by its lock reports
+	 * nothing. Present only with ShedLock; the post-processor itself looks ShedLock types
+	 * up by name.
+	 */
+	@Configuration(proxyBeanMethods = false)
+	@Conditional(CronbellActivation.On.class)
+	@ConditionalOnClass(name = "net.javacrumbs.shedlock.core.LockProvider")
+	static class ShedLockMonitoring {
+
+		@Bean
+		static LockProviderPostProcessor cronbellLockProviderPostProcessor() {
+			return new LockProviderPostProcessor();
 		}
 
 	}

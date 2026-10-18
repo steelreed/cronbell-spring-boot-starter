@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-package com.steelreed.cronbell.spring.internal;
+package com.steelreed.cronbell.spring.internal.shedlock;
+
+import com.steelreed.cronbell.spring.internal.Reporter;
+import com.steelreed.cronbell.spring.internal.Run;
 
 /**
  * Connects a {@code @Scheduled} run to the ShedLock lock it asks for on the same thread.
@@ -47,11 +50,19 @@ public final class LockedRuns {
 
 	}
 
-	static void await(Run run, Reporter reporter) {
+	/**
+	 * Holds back the {@code start} ping of a run until its lock is decided.
+	 * @param run the run
+	 * @param reporter sends the pings
+	 */
+	public static void await(Run run, Reporter reporter) {
 		CURRENT.set(new Pending(run, reporter));
 	}
 
-	static void clear() {
+	/**
+	 * Forgets the run waiting on this thread.
+	 */
+	public static void clear() {
 		CURRENT.remove();
 	}
 

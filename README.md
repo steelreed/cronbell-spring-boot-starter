@@ -8,8 +8,8 @@ starter finds every scheduled job in your application, registers it with
 [Cronbell](https://github.com/steelreed/cronbell) with its real schedule, and reports each run.
 Cronbell alerts you when a run is missed, fails or takes too long.
 
-> **Status: in development.** Not on Maven Central yet. Cronbell's first release is planned for
-> December 2026; join the early-access list at [steelreed.com/cronbell](https://steelreed.com/cronbell/).
+> **Status: beta.** `0.1.0-beta.1` is on Maven Central; `0.1.0` comes with Cronbell's first
+> release on November 3, 2026. Try the server at [steelreed.com/cronbell](https://steelreed.com/cronbell/).
 
 ## Quick start
 
@@ -17,7 +17,7 @@ Cronbell alerts you when a run is missed, fails or takes too long.
 <dependency>
   <groupId>com.steelreed</groupId>
   <artifactId>cronbell-spring-boot-starter</artifactId>
-  <version>0.1.0</version>
+  <version>0.1.0-beta.1</version>
 </dependency>
 ```
 

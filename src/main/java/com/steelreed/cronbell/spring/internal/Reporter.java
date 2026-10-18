@@ -27,6 +27,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Consumer;
 import java.util.function.LongSupplier;
 
 import com.steelreed.cronbell.spring.internal.CronbellClient.ApiException;
@@ -85,8 +86,7 @@ public class Reporter implements AutoCloseable {
 		this(client, upsert, capacity, System::nanoTime, logger::warn);
 	}
 
-	Reporter(CronbellClient client, boolean upsert, int capacity, LongSupplier nanoClock,
-			java.util.function.Consumer<String> warnings) {
+	Reporter(CronbellClient client, boolean upsert, int capacity, LongSupplier nanoClock, Consumer<String> warnings) {
 		this.client = client;
 		this.upsert = upsert;
 		this.capacity = Math.max(1, capacity);

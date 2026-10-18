@@ -29,6 +29,7 @@ import java.util.Set;
 
 import com.steelreed.cronbell.spring.CronbellCheck;
 import com.steelreed.cronbell.spring.CronbellProperties;
+import com.steelreed.cronbell.spring.internal.shedlock.SchedulerLockAnnotation;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -36,8 +37,6 @@ import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.core.annotation.AnnotatedElementUtils;
-import org.springframework.core.annotation.MergedAnnotation;
-import org.springframework.core.annotation.MergedAnnotations;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.scheduling.annotation.Schedules;
 import org.springframework.scheduling.config.CronTask;
@@ -65,8 +64,6 @@ import org.springframework.util.StringUtils;
 public class ScheduledTaskDiscovery {
 
 	private static final Log logger = LogFactory.getLog(ScheduledTaskDiscovery.class);
-
-	static final String SCHEDULER_LOCK = "net.javacrumbs.shedlock.spring.annotation.SchedulerLock";
 
 	private final ConfigurableListableBeanFactory beanFactory;
 
@@ -205,15 +202,15 @@ public class ScheduledTaskDiscovery {
 			grace = this.properties.getGrace();
 		}
 		Duration maxRuntime = (annotation != null) ? Durations.parse(resolve(annotation.maxRuntime())) : null;
-		MergedAnnotation<?> lock = MergedAnnotations.from(method).get(SCHEDULER_LOCK);
-		if (maxRuntime == null && lock.isPresent()) {
+		SchedulerLockAnnotation lock = SchedulerLockAnnotation.find(method);
+		if (maxRuntime == null && lock != null) {
 			maxRuntime = lockAtMostFor(lock);
 		}
 
 		CheckDefinition definition = new CheckDefinition(
 				SlugNaming.withEnvironment(this.properties.getEnvironment(), slug), name, cron, zone, period,
 				Durations.toSecondsCeil(grace), Durations.toSecondsCeil(maxRuntime));
-		return new MonitoredCheck(definition, source, lock.isPresent());
+		return new MonitoredCheck(definition, source, lock != null);
 	}
 
 	private String zoneOf(Method method) {
@@ -234,9 +231,9 @@ public class ScheduledTaskDiscovery {
 		return seconds;
 	}
 
-	private Duration lockAtMostFor(MergedAnnotation<?> lock) {
+	private Duration lockAtMostFor(SchedulerLockAnnotation lock) {
 		try {
-			String value = resolve(lock.getString("lockAtMostFor"));
+			String value = resolve(lock.lockAtMostFor());
 			Duration duration = Durations.parse(value);
 			return (duration != null && !duration.isZero() && !duration.isNegative()) ? duration : null;
 		}

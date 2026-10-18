@@ -4,7 +4,7 @@
 
   <groupId>com.steelreed</groupId>
   <artifactId>cronbell-spring-boot-starter</artifactId>
-  <version>0.1.0-SNAPSHOT</version>
+  <version>0.1.0-beta.1</version>
 
   <name>Cronbell Spring Boot Starter</name>
   <description>Monitors every @Scheduled method and Quartz trigger of a Spring Boot application with Cronbell, with no code to write.</description>
@@ -50,8 +50,10 @@
     <!-- The Spring Boot line the build compiles and tests against. CI also runs the floor
          (-Pboot33) and the 4.x line (-Pboot4); see the profiles at the end. -->
     <spring-boot.version>3.5.16</spring-boot.version>
-    <!-- Test only: ShedLock 6 is the Spring 6 line, ShedLock 7 the Spring 7 line. -->
+    <!-- Test only. ShedLock 6 supports Spring 6.1 and 6.2 (Boot 3.3 to 3.5); ShedLock 7 needs
+         Spring 6.2+ (Boot 3.4+), so it is used for the Boot 4 profile only. Both need Java 17. -->
     <shedlock.version>6.10.0</shedlock.version>
+    <archunit.version>1.5.1</archunit.version>
 
     <!-- Plugins -->
     <compiler-plugin.version>3.16.0</compiler-plugin.version>
@@ -60,7 +62,7 @@
     <source-plugin.version>3.4.0</source-plugin.version>
     <javadoc-plugin.version>3.12.0</javadoc-plugin.version>
     <gpg-plugin.version>3.2.8</gpg-plugin.version>
-    <central-publishing-plugin.version>0.8.0</central-publishing-plugin.version>
+    <central-publishing-plugin.version>0.11.0</central-publishing-plugin.version>
     <enforcer-plugin.version>3.6.3</enforcer-plugin.version>
     <spring-javaformat.version>0.0.48</spring-javaformat.version>
   </properties>
@@ -94,6 +96,12 @@
       <artifactId>quartz</artifactId>
       <optional>true</optional>
     </dependency>
+    <!-- Compile only: Actuator's Info type carries Jackson annotations; without them javac warns. -->
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-annotations</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>org.springframework.boot</groupId>
@@ -111,6 +119,12 @@
       <version>${shedlock.version}</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.tngtech.archunit</groupId>
+      <artifactId>archunit</artifactId>
+      <version>${archunit.version}</version>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -122,7 +136,9 @@
           <version>${compiler-plugin.version}</version>
           <configuration>
             <compilerArgs>
+              <!-- Every lint warning, deprecation and removal included, fails the build. -->
               <arg>-Xlint:all,-processing,-options</arg>
+              <arg>-Werror</arg>
               <arg>-parameters</arg>
             </compilerArgs>
             <annotationProcessorPaths>
@@ -150,7 +166,7 @@
           <version>${javadoc-plugin.version}</version>
           <configuration>
             <!-- The published Javadoc is the public API; internal packages carry no promises. -->
-            <excludePackageNames>*.internal</excludePackageNames>
+            <excludePackageNames>*.internal:*.internal.*</excludePackageNames>
             <notimestamp>true</notimestamp>
             <quiet>true</quiet>
           </configuration>
@@ -264,7 +280,10 @@
         <shedlock.version>7.10.1</shedlock.version>
       </properties>
     </profile>
-    <!-- Enabled only for releases: ./mvnw -Prelease deploy (the maintainer runs it, never CI on a branch) -->
+    <!-- Enabled only for releases, by .github/workflows/release.yml on a v* tag (see RELEASING.md).
+         Adds the sources and Javadoc jars, GPG signatures and the upload to Maven Central.
+         To check the jars locally without signing or uploading:
+         ./mvnw -Prelease -DskipTests -Dgpg.skip package -->
     <profile>
       <id>release</id>
       <build>
@@ -323,7 +342,10 @@
             <configuration>
               <publishingServerId>central</publishingServerId>
               <autoPublish>false</autoPublish>
-              <!-- Fail the release build when Central rejects the bundle, not later in the portal. -->
+              <!-- Fail the release build when Central rejects the bundle, not later in the portal.
+                   Never set skipPublishing to leave an artifact out: the last module uploads the
+                   whole bundle, so QueryFence 0.1.0 signed everything and uploaded nothing. Use
+                   excludeArtifacts instead (this build has a single module). -->
               <waitUntil>validated</waitUntil>
             </configuration>
           </plugin>

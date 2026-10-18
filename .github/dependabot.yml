@@ -12,6 +12,9 @@ updates:
       # Several Spring Boot lines are tested through profiles; bump majors by hand.
       - dependency-name: "org.springframework.boot*"
         update-types: ["version-update:semver-major"]
+      # ShedLock 7 drops Spring 6.1 (Boot 3.3); the Boot 4 profile sets its own version.
+      - dependency-name: "net.javacrumbs.shedlock*"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: github-actions
     directory: /
     schedule:

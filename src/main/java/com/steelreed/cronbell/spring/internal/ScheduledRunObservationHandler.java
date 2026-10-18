@@ -18,6 +18,7 @@ package com.steelreed.cronbell.spring.internal;
 
 import java.util.function.BooleanSupplier;
 
+import com.steelreed.cronbell.spring.internal.shedlock.LockedRuns;
 import io.micrometer.observation.Observation;
 import io.micrometer.observation.ObservationHandler;
 import org.apache.commons.logging.Log;
